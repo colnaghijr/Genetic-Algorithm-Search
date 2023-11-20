@@ -3,7 +3,7 @@ This is a VERY simplified version of a genetic algorithm.
 It is meant to be used as a learning tool, to turn basic terms and concepts into C# code.
 
 ## Terminology
-- `rgb(9, 105, 218)`*Population*: It is a subset of all the possible solutions to a given problem.
+- *Population*: It is a subset of all the possible solutions to a given problem.
 - *Citizen (aka Individual)*: an individual in a population that holds genetic data (Chromosome, Fitness)
 - *Chromosome*: A chromosome is one such solution to the given problem.
 - *Gene*: A gene is one element position of a chromosome.
