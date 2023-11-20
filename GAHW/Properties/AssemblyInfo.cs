@@ -1,16 +1,15 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("GAHW")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Genetic Algorithm Search")]
+[assembly: AssemblyDescription("This is a VERY simplified version of a genetic algorithm.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Dell Inc.")]
-[assembly: AssemblyProduct("GAHW")]
-[assembly: AssemblyCopyright("Copyright © Dell Inc. 2008")]
+[assembly: AssemblyCompany("Roberto Colnaghi Jr (author)")]
+[assembly: AssemblyProduct("Genetic Algorithm Search")]
+[assembly: AssemblyCopyright("Copyright (c) 2008 Roberto Colnaghi Jr")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
