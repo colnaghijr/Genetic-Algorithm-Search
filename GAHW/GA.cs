@@ -92,7 +92,7 @@ namespace GeneticAlgorithm {
         }
 
         public override string ToString() {
-            return string.Format("f:{1} v:{0}", new String(Chromosome), Fitness);
+            return string.Format("f:{1} c:[{0}]", new String(Chromosome), Fitness);
         }
     }
 

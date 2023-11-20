@@ -36,7 +36,7 @@ namespace GeneticaAlgorithm {
                 Invoke(new SearchResultHandler(GABestSoFar), new object[] { result });
             }
             else {
-                txtOutput.Text = string.Format("g:{0} f:{2} v:{1}\r\n", result.GenerationsRun, result.Best.ToString(), result.Best.Fitness) + txtOutput.Text;
+                txtOutput.Text = string.Format("GEN:{0} BestChromosome:{1}\r\n", result.GenerationsRun, result.Best.ToString()) + txtOutput.Text;
             }
         }
 
@@ -45,7 +45,7 @@ namespace GeneticaAlgorithm {
                 Invoke(new SearchResultHandler(GAFinished), new object[] { result });
             }
             else {
-                txtOutput.Text = string.Format("FINISHED? [ng:{0} f:{2} v:{1}]\r\n", result.GenerationsRun, result.Best.ToString(), result.Best.Fitness) + txtOutput.Text;
+                txtOutput.Text = string.Format("FINISHED [Generations:{0} BestChromosome:{1}]\r\n", result.GenerationsRun, result.Best.ToString()) + txtOutput.Text;
             }
         }
     }
