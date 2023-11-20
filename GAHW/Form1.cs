@@ -5,6 +5,9 @@ using System.Windows.Forms;
 
 namespace GeneticaAlgorithm {
     public partial class frmMain : Form {
+        private GeneticaAlgorithmSearch geneticAlgorithmSearch;
+        private Thread worker;
+
         public frmMain() {
             InitializeComponent();
         }
@@ -15,20 +18,24 @@ namespace GeneticaAlgorithm {
         private void btnStart_Click(object sender, EventArgs e) {
             txtOutput.Text = "Starting...";
 
-            GeneticaAlgorithmSearch ga = new GeneticaAlgorithmSearch();
-            ga.BestOfGenerationFound += GABestSoFar;
-            ga.Finished += GAFinished;
-            ga.targetWord = txtLookFor.Text;
-            ga.maxGenerations = 180;
-            ga.maxPopulationPerGeneration = 30000;
+            geneticAlgorithmSearch = new GeneticaAlgorithmSearch();
+            geneticAlgorithmSearch.BestOfGenerationFound += GABestSoFar;
+            geneticAlgorithmSearch.Finished += GAFinished;
+            geneticAlgorithmSearch.targetWord = txtLookFor.Text;
+            geneticAlgorithmSearch.maxGenerations = 180;
+            geneticAlgorithmSearch.maxPopulationPerGeneration = 30000;
 
-            Thread worker = new Thread(ga.StartSearch);
+            worker = new Thread(geneticAlgorithmSearch.StartSearch);
             worker.Start();
         }
 
         private void frmMain_KeyDown(object sender, KeyEventArgs e) {
-            if (e.KeyCode == Keys.Escape)
+            if (e.KeyCode == Keys.Escape) {
+                geneticAlgorithmSearch.BestOfGenerationFound -= GABestSoFar;
+                geneticAlgorithmSearch.Finished -= GAFinished;
+                worker.Abort();
                 this.Close();
+            }
         }
 
         private void GABestSoFar(GeneticAlgorithmSearchResult result) {
