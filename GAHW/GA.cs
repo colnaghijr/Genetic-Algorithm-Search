@@ -66,6 +66,8 @@ namespace GeneticAlgorithm {
         public char[] Chromosome;
         // How close to the target is this citizen
         public int Fitness;
+        // Simple random generator
+        private static Random random = new Random();
 
         public Citizen(int size) {
             Chromosome = new char[size];
@@ -76,9 +78,8 @@ namespace GeneticAlgorithm {
 
         // Create an initial random genome for the citizen
         protected void RandomizeGenome() {
-            Random r = new Random();
             for (int j = 0; j < Chromosome.Length; j++) {
-                Chromosome[j] = (char)((126 * r.NextDouble()) + 32);
+                Chromosome[j] = (char)((126 * random.NextDouble()) + 32);
             }
         }
 
@@ -121,6 +122,8 @@ namespace GeneticAlgorithm {
         public int maxGenerations;
         // limits the number of citizens per generation
         public int maxPopulationPerGeneration;
+        // Simple random generator
+        private static Random random = new Random();
 
         public void StartSearch() {
             //Final Chromosome to find
@@ -145,12 +148,7 @@ namespace GeneticAlgorithm {
                 best = GetBest();
 
                 //Return best match so far
-                if (BestOfGenerationFound != null) {
-                    GeneticAlgorithmSearchResult result = new GeneticAlgorithmSearchResult();
-                    result.Best = best;
-                    result.GenerationsRun = gen;
-                    BestOfGenerationFound(result);
-                }
+                BestOfGenerationFound?.Invoke(new GeneticAlgorithmSearchResult { Best = best, GenerationsRun = gen });
 
                 //Get best & check
                 //If equal, done (optimal find)
@@ -164,19 +162,13 @@ namespace GeneticAlgorithm {
             }
 
             //Return best match
-            if (Finished != null) {
-                GeneticAlgorithmSearchResult result = new GeneticAlgorithmSearchResult();
-                result.Best = best;
-                result.GenerationsRun = gen;
-                Finished(result);
-            }
+            Finished?.Invoke(new GeneticAlgorithmSearchResult { Best = best, GenerationsRun = gen });
         }
 
         //Create initial population for this search
         private void GenerateInitialPopulation(int targetSize, int maxPopulationPerGeneration) {
             for (int i = 0; i < maxPopulationPerGeneration; i++) {
-                Citizen c = new Citizen(targetSize);
-                Population.Add(c);
+                Population.Add(new Citizen(targetSize));
             }
         }
 
@@ -191,11 +183,10 @@ namespace GeneticAlgorithm {
         private Citizen GetBest() {
             Citizen best = null;
             foreach (Citizen c in Population) {
-                if (best == null) {
+                if (best == null || c.Fitness < best.Fitness)
+                {
                     best = c;
-                    continue;
                 }
-                if (c.Fitness < best.Fitness) best = c;
             }
             return best;
         }
@@ -203,33 +194,32 @@ namespace GeneticAlgorithm {
         // Mate the population applying Crossover, Mutation and Elitism
         private void MatePopulation(int targetSize, int maxPopulationPerGeneration, float elitismRate, float mutationRate) {
             int elitSize = (int)(maxPopulationPerGeneration * elitismRate);
-            Random r = new Random();
 
-            // Keep the fitest
+            // Keep the fittest
             Elitism(elitSize);
 
             // Mate the rest
             for (int i = elitSize; i < maxPopulationPerGeneration; i++) {
-                NextGeneration.Add(new Citizen(targetSize));
+                int i1 = random.Next(maxPopulationPerGeneration);
+                int i2 = random.Next(maxPopulationPerGeneration);
+                int spos = random.Next(targetSize);
 
-                int i1 = (int)(r.NextDouble() * maxPopulationPerGeneration);
-                int i2 = (int)(r.NextDouble() * maxPopulationPerGeneration);
-                int spos = (int)(r.NextDouble() * targetSize);
+                char[] newChromosome = new char[targetSize];
+                Array.Copy(Population[i1].Chromosome, 0, newChromosome, 0, spos);
+                Array.Copy(Population[i2].Chromosome, spos, newChromosome, spos, targetSize - spos);
 
-                NextGeneration[i].Chromosome =
-                    (new String(Population[i1].Chromosome).Substring(0, spos) +
-                    new String(Population[i2].Chromosome).Substring(spos, targetSize - spos)).ToCharArray();
+                Citizen offspring = new Citizen(targetSize) { Chromosome = newChromosome };
 
-                if (r.NextDouble() < mutationRate) Mutate(NextGeneration[i], targetSize, r);
+                if (random.NextDouble() < mutationRate) Mutate(offspring, targetSize);
+
+                NextGeneration.Add(offspring);
             }
         }
 
         // Mutate a citizen
-        private void Mutate(Citizen citizen, int targetSize, Random r) {
-            int ipos = (int)(r.NextDouble() * targetSize);
-            int mutantGene = (int)(r.NextDouble() * 126) + 32;
-
-            citizen.Chromosome[ipos] = (char)mutantGene;
+        private void Mutate(Citizen citizen, int targetSize) {
+            int ipos = random.Next(targetSize);
+            citizen.Chromosome[ipos] = (char)random.Next(32, 127);
         }
 
         // Keep the fitest citizens
@@ -242,10 +232,9 @@ namespace GeneticAlgorithm {
 
         // Swap current population with next generation
         private void SwapPopulation() {
-            Population.Clear();
-            foreach (Citizen c in NextGeneration) {
-                Population.Add(c);
-            }
+            var temp = Population;
+            Population = NextGeneration;
+            NextGeneration = temp;
             NextGeneration.Clear();
         }
     }
