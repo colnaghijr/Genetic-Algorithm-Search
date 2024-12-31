@@ -1,58 +1,105 @@
 ﻿using GeneticAlgorithm;
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace GeneticaAlgorithm {
-    public partial class frmMain : Form {
+    public partial class frmMain : Form
+    {
         private GeneticaAlgorithmSearch geneticAlgorithmSearch;
-        private Thread worker;
+        private CancellationTokenSource cancellationTokenSource;
 
-        public frmMain() {
+        public frmMain()
+        {
             InitializeComponent();
         }
 
-        private void frmMain_Load(object sender, EventArgs e) {
+        private void frmMain_Load(object sender, EventArgs e)
+        {
         }
 
-        private void btnStart_Click(object sender, EventArgs e) {
+        private async void btnStart_Click(object sender, EventArgs e)
+        {
+            if (btnStart.Text == "Cancel")
+            {
+                cancellationTokenSource.Cancel();
+                return;
+            }
+
             txtOutput.Text = "Starting...";
+            btnStart.Text = "Cancel";
 
             geneticAlgorithmSearch = new GeneticaAlgorithmSearch();
             geneticAlgorithmSearch.BestOfGenerationFound += GABestSoFar;
             geneticAlgorithmSearch.Finished += GAFinished;
             geneticAlgorithmSearch.targetWord = txtLookFor.Text;
-            geneticAlgorithmSearch.maxGenerations = 180;
-            geneticAlgorithmSearch.maxPopulationPerGeneration = 30000;
+            geneticAlgorithmSearch.maxGenerations = int.Parse(txtMaxGenerations.Text);
+            geneticAlgorithmSearch.maxPopulationPerGeneration = int.Parse(txtPopulationPerGeneration.Text);
 
-            worker = new Thread(geneticAlgorithmSearch.StartSearch);
-            worker.Start();
+            cancellationTokenSource = new CancellationTokenSource();
+
+            try
+            {
+                await Task.Run(() => geneticAlgorithmSearch.StartSearch(cancellationTokenSource.Token));
+            }
+            catch (OperationCanceledException)
+            {
+                txtOutput.Text = "Operation canceled.\r\n" + txtOutput.Text;
+            }
+            finally
+            {
+                btnStart.Text = "Start";
+            }
         }
 
-        private void frmMain_KeyDown(object sender, KeyEventArgs e) {
-            if (e.KeyCode == Keys.Escape) {
+        private void frmMain_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Escape)
+            {
                 geneticAlgorithmSearch.BestOfGenerationFound -= GABestSoFar;
                 geneticAlgorithmSearch.Finished -= GAFinished;
-                worker.Abort();
+                cancellationTokenSource.Cancel();
                 this.Close();
             }
         }
 
-        private void GABestSoFar(GeneticAlgorithmSearchResult result) {
-            if (InvokeRequired) {
+        private void GABestSoFar(GeneticAlgorithmSearchResult result)
+        {
+            if (InvokeRequired)
+            {
                 Invoke(new SearchResultHandler(GABestSoFar), new object[] { result });
             }
-            else {
+            else
+            {
                 txtOutput.Text = string.Format("GEN:{0} BestChromosome:{1}\r\n", result.GenerationsRun, result.Best.ToString()) + txtOutput.Text;
             }
         }
 
-        private void GAFinished(GeneticAlgorithmSearchResult result) {
-            if (InvokeRequired) {
+        private void GAFinished(GeneticAlgorithmSearchResult result)
+        {
+            if (InvokeRequired)
+            {
                 Invoke(new SearchResultHandler(GAFinished), new object[] { result });
             }
-            else {
+            else
+            {
                 txtOutput.Text = string.Format("FINISHED [Generations:{0} BestChromosome:{1}]\r\n", result.GenerationsRun, result.Best.ToString()) + txtOutput.Text;
+            }
+        }
+
+        private void txtMaxGenerations_KeyPress(object sender, KeyPressEventArgs e) {
+            if (!Char.IsDigit(e.KeyChar) && e.KeyChar != (char)Keys.Back) {
+                e.Handled = true; // Prevent non-numeric characters from being entered
+
+            }
+        }
+
+        private void txtPopulationPerGeneration_KeyPress(object sender, KeyPressEventArgs e) {
+            if (!Char.IsDigit(e.KeyChar) && e.KeyChar != (char)Keys.Back)
+            {
+                e.Handled = true; // Prevent non-numeric characters from being entered
+
             }
         }
     }

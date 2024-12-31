@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 
 /*
     MIT License
@@ -125,7 +126,8 @@ namespace GeneticAlgorithm {
         // Simple random generator
         private static Random random = new Random();
 
-        public void StartSearch() {
+        public void StartSearch(CancellationToken cancellationToken)
+        {
             //Final Chromosome to find
             char[] target = targetWord.ToCharArray();
             //Chromosome Size
@@ -140,6 +142,12 @@ namespace GeneticAlgorithm {
 
             int gen = 0;
             for (; gen < maxGenerations; gen++) {
+                // Check for cancellation and abort as is
+                if (cancellationToken.IsCancellationRequested) {
+                    Finished?.Invoke(new GeneticAlgorithmSearchResult { Best = best, GenerationsRun = gen });
+                    return;
+                }
+
                 //Start processing generation
 
                 //Fitness calculation
