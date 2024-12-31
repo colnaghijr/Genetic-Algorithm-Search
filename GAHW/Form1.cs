@@ -57,10 +57,7 @@ namespace GeneticaAlgorithm {
         {
             if (e.KeyCode == Keys.Escape)
             {
-                geneticAlgorithmSearch.BestOfGenerationFound -= GABestSoFar;
-                geneticAlgorithmSearch.Finished -= GAFinished;
                 cancellationTokenSource.Cancel();
-                this.Close();
             }
         }
 
