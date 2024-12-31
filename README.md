@@ -2,6 +2,8 @@
 This is a VERY simplified version of a genetic algorithm.
 It is meant to be used as a learning tool, to turn basic terms and concepts into C# code.
 
+![til](./GeneticAlgorithm.gif)
+
 ## Terminology
 - *Population*: It is a subset of all the possible solutions to a given problem.
 - *Citizen (aka Individual)*: an individual in a population that holds genetic data (Chromosome, Fitness)
