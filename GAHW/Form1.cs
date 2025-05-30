@@ -4,18 +4,24 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace GeneticaAlgorithm {
-    public partial class frmMain : Form
+namespace GeneticAlgorithm {
+    public partial class MainForm : Form // Renamed frmMain to MainForm
     {
-        private GeneticaAlgorithmSearch geneticAlgorithmSearch;
+        private GeneticAlgorithmSearch geneticAlgorithmSearch;
         private CancellationTokenSource cancellationTokenSource;
 
-        public frmMain()
+        public MainForm() // Renamed frmMain to MainForm constructor
         {
             InitializeComponent();
+            // Ensure event handlers in Designer.cs are updated if they were frmMain_Load etc.
+            // This part is manual if not handled by IDE:
+            // this.Load -= new System.EventHandler(this.frmMain_Load);
+            // this.Load += new System.EventHandler(this.MainForm_Load);
+            // this.KeyDown -= new System.Windows.Forms.KeyEventHandler(this.frmMain_KeyDown);
+            // this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyDown);
         }
 
-        private void frmMain_Load(object sender, EventArgs e)
+        private void MainForm_Load(object sender, EventArgs e) // Renamed frmMain_Load to MainForm_Load
         {
         }
 
@@ -23,39 +29,93 @@ namespace GeneticaAlgorithm {
         {
             if (btnStart.Text == "Cancel")
             {
-                cancellationTokenSource.Cancel();
+                if (cancellationTokenSource != null && !cancellationTokenSource.IsCancellationRequested)
+                {
+                    cancellationTokenSource.Cancel();
+                }
                 return;
             }
 
-            txtOutput.Text = "Starting...";
-            btnStart.Text = "Cancel";
+            // Improved Input Parsing
+            if (string.IsNullOrWhiteSpace(txtLookFor.Text))
+            {
+                MessageBox.Show("Target word cannot be empty.", "Input Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
 
-            geneticAlgorithmSearch = new GeneticaAlgorithmSearch();
+            if (!int.TryParse(txtMaxGenerations.Text, out int maxGenerationsInput)) {
+                MessageBox.Show("Invalid input for Max Generations. Please enter a valid number.", "Input Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            if (!int.TryParse(txtPopulationPerGeneration.Text, out int populationPerGenerationInput)) {
+                MessageBox.Show("Invalid input for Population per Generation. Please enter a valid number.", "Input Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            
+            txtOutput.Text = "Starting...\r\n"; // Add newline for subsequent messages
+            btnStart.Text = "Cancel";
+            
+            SetInputControlsEnabled(false); // Disable input fields during search
+
+            await StartGeneticAlgorithmAsync(txtLookFor.Text, maxGenerationsInput, populationPerGenerationInput);
+        }
+
+        private async Task StartGeneticAlgorithmAsync(string targetWord, int maxGen, int popPerGen)
+        {
+            geneticAlgorithmSearch = new GeneticAlgorithmSearch
+            {
+                TargetWord = targetWord, // Using new property names
+                MaxGenerations = maxGen,
+                MaxPopulationPerGeneration = popPerGen,
+                ElitismRate = 0.10f, // Assuming default, or add UI fields for these
+                MutationRate = 0.25f  // Assuming default, or add UI fields for these
+            };
             geneticAlgorithmSearch.BestOfGenerationFound += GABestSoFar;
             geneticAlgorithmSearch.Finished += GAFinished;
-            geneticAlgorithmSearch.targetWord = txtLookFor.Text;
-            geneticAlgorithmSearch.maxGenerations = int.Parse(txtMaxGenerations.Text);
-            geneticAlgorithmSearch.maxPopulationPerGeneration = int.Parse(txtPopulationPerGeneration.Text);
 
+            // Recreate CTS for each run to ensure it's fresh
+            cancellationTokenSource?.Dispose(); 
             cancellationTokenSource = new CancellationTokenSource();
 
             try
             {
-                await Task.Run(() => geneticAlgorithmSearch.StartSearch(cancellationTokenSource.Token));
+                await Task.Run(() => geneticAlgorithmSearch.StartSearch(cancellationTokenSource.Token), cancellationTokenSource.Token);
             }
             catch (OperationCanceledException)
             {
-                txtOutput.Text = "Operation canceled.\r\n" + txtOutput.Text;
+                txtOutput.AppendText("Operation canceled.\r\n"); // Append to avoid overwriting
             }
             finally
             {
-                btnStart.Text = "Start";
+                if (InvokeRequired)
+                {
+                    Invoke((Action)(() => {
+                        btnStart.Text = "Start";
+                        SetInputControlsEnabled(true);
+                    }));
+                }
+                else
+                {
+                    btnStart.Text = "Start";
+                    SetInputControlsEnabled(true);
+                }
+                // Dispose CTS here as the operation it was controlling is complete or cancelled.
+                cancellationTokenSource?.Dispose();
+                cancellationTokenSource = null;
             }
         }
-
-        private void frmMain_KeyDown(object sender, KeyEventArgs e)
+        
+        private void SetInputControlsEnabled(bool enabled)
         {
-            if (e.KeyCode == Keys.Escape)
+            txtLookFor.Enabled = enabled;
+            txtMaxGenerations.Enabled = enabled;
+            txtPopulationPerGeneration.Enabled = enabled;
+        }
+
+        private void MainForm_KeyDown(object sender, KeyEventArgs e) // Renamed frmMain_KeyDown to MainForm_KeyDown
+        {
+            if (e.KeyCode == Keys.Escape && cancellationTokenSource != null && !cancellationTokenSource.IsCancellationRequested)
             {
                 cancellationTokenSource.Cancel();
             }
@@ -81,7 +141,7 @@ namespace GeneticaAlgorithm {
             }
             else
             {
-                txtOutput.Text = string.Format("FINISHED [Generations:{0} BestChromosome:{1}]\r\n", result.GenerationsRun, result.Best.ToString()) + txtOutput.Text;
+                txtOutput.Text = string.Format("FINISHED Generations:{0} BestChromosome:{1}\r\n", result.GenerationsRun, result.Best.ToString()) + txtOutput.Text;
             }
         }
 

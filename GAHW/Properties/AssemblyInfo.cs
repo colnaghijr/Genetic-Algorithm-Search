@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Roberto Colnaghi Jr (author)")]
 [assembly: AssemblyProduct("Genetic Algorithm Search")]
-[assembly: AssemblyCopyright("Copyright (c) 2008 Roberto Colnaghi Jr")]
+[assembly: AssemblyCopyright("Copyright © 2008-2024 Roberto Colnaghi Jr")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

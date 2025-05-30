@@ -1,5 +1,5 @@
-﻿namespace GeneticaAlgorithm {
-    partial class frmMain {
+﻿namespace GeneticAlgorithm {
+    partial class MainForm { // Renamed frmMain to MainForm
         /// <summary>
         /// Required designer variable.
         /// </summary>
@@ -130,7 +130,7 @@
             this.txtPopulationPerGeneration.Text = "10000";
             this.txtPopulationPerGeneration.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtPopulationPerGeneration_KeyPress);
             // 
-            // frmMain
+            // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -146,10 +146,10 @@
             this.KeyPreview = true;
             this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.MinimumSize = new System.Drawing.Size(439, 431);
-            this.Name = "frmMain";
+            this.Name = "MainForm"; // Renamed frmMain to MainForm
             this.Text = "Genetic Algorithm Search";
-            this.Load += new System.EventHandler(this.frmMain_Load);
-            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.frmMain_KeyDown);
+            this.Load += new System.EventHandler(this.MainForm_Load); // Corrected to MainForm_Load
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyDown); // Corrected to MainForm_KeyDown
             this.ResumeLayout(false);
             this.PerformLayout();
 
