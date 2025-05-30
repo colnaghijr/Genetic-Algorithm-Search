@@ -91,7 +91,7 @@ namespace GeneticAlgorithm {
         }
 
         public override string ToString() {
-            return $"f:{Fitness} c:[{new string(Chromosome)}]";
+            return $"f:{Fitness} c:{new string(Chromosome)}";
         }
     }
 

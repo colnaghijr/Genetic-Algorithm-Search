@@ -141,7 +141,7 @@ namespace GeneticAlgorithm {
             }
             else
             {
-                txtOutput.Text = string.Format("FINISHED [Generations:{0} BestChromosome:{1}]\r\n", result.GenerationsRun, result.Best.ToString()) + txtOutput.Text;
+                txtOutput.Text = string.Format("FINISHED Generations:{0} BestChromosome:{1}\r\n", result.GenerationsRun, result.Best.ToString()) + txtOutput.Text;
             }
         }
 
