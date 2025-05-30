@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace GeneticaAlgorithm {
+namespace GeneticAlgorithm {
     static class Program {
         /// <summary>
         /// The main entry point for the application.
@@ -10,7 +10,7 @@ namespace GeneticaAlgorithm {
         static void Main() {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new frmMain());
+            Application.Run(new MainForm()); // Corrected to use MainForm
         }
     }
 }
